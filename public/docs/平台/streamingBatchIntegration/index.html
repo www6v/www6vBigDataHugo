@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head><script src="/www6vBigData/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=www6vBigData/livereload" data-no-instant defer></script>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+
+
+  数据湖  vs 数据仓库[1]
+  #
+
+
+  
+      
+          特性
+          数据仓库
+          数据湖
+      
+  
+  
+      
+          数据
+          来自事务系统、运营数据库和业务线应用程序的关系数据
+          来自 IoT 设备、网站、移动应用程序、社交媒体和企业应用程序的非关系和关系数据
+      
+      
+          Schema
+          设计在数据仓库实施之前（写入型 Schema）
+          写入在分析时（读取型 Schema）
+      
+      
+          性价比
+          更快查询结果会带来较高存储成本
+          更快查询结果只需较低存储成本
+      
+      
+          数据质量
+          可作为重要事实依据的高度监管数据
+          任何可以或无法进行监管的数据（例如原始数据）
+      
+      
+          用户
+          业务分析师
+          数据科学家、数据开发人员和业务分析师（使用监管数据）
+      
+      
+          分析
+          批处理报告、BI 和可视化
+          机器学习、预测分析、数据发现和分析
+      
+  
+
+
+  湖仓一体
+  #
+
+
+  参考
+  #
+
+
+
+什么是数据湖？ AWS
+
+
+大数据架构如何做到流批一体？
+
+">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://localhost:1313/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/streamingBatchIntegration/">
+  <meta property="og:site_name" content="BigData">
+  <meta property="og:title" content="批流一体">
+  <meta property="og:description" content="数据湖 vs 数据仓库[1] # 特性 数据仓库 数据湖 数据 来自事务系统、运营数据库和业务线应用程序的关系数据 来自 IoT 设备、网站、移动应用程序、社交媒体和企业应用程序的非关系和关系数据 Schema 设计在数据仓库实施之前（写入型 Schema） 写入在分析时（读取型 Schema） 性价比 更快查询结果会带来较高存储成本 更快查询结果只需较低存储成本 数据质量 可作为重要事实依据的高度监管数据 任何可以或无法进行监管的数据（例如原始数据） 用户 业务分析师 数据科学家、数据开发人员和业务分析师（使用监管数据） 分析 批处理报告、BI 和可视化 机器学习、预测分析、数据发现和分析 湖仓一体 # 参考 # 什么是数据湖？ AWS
+大数据架构如何做到流批一体？">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:published_time" content="2022-08-04T15:17:10+00:00">
+    <meta property="article:modified_time" content="2022-08-04T15:17:10+00:00">
+    <meta property="article:tag" content="批流一体">
+<title>批流一体 | BigData</title>
+<link rel="icon" href="/www6vBigData/favicon.png" >
+<link rel="manifest" href="/www6vBigData/manifest.json">
+<link rel="canonical" href="http://localhost:1313/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/streamingBatchIntegration/">
+<link rel="stylesheet" href="/www6vBigData/book.min.3257a7ce7c061eb5dfc72257c356229b1470dc77ce9b982ac220c02542f9f04f.css" integrity="sha256-MlenznwGHrXfxyJXw1YimxRw3HfOm5gqwiDAJUL58E8=" crossorigin="anonymous">
+  <script defer src="/www6vBigData/fuse.min.js"></script>
+  <script defer src="/www6vBigData/en.search.min.2a93593b19331cfaae19de3e191587e93df07511e3a05624c62862b27fe27d7d.js" integrity="sha256-KpNZOxkzHPquGd4&#43;GRWH6T3wdRHjoFYkxihisn/ifX0=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/www6vBigData/"><span>BigData</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/dataMiddlePlatform/dataMiddlePlatform/" class="">数据中台</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/personProflie/personProflie/" class="">用户画像</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataSummary/" class="">大数据  汇总</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/userBehaviorAnalysis/userBehaviorAnalysis/" class="">用户行为分析</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E8%AE%A1%E7%AE%97/bigDataSchedule/bigDataSchedule/" class="">大数据 调度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/bigDataMetaMgt/bigDataMetaMgt/" class="">大数据 元数据管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/clickhouse/clickhouse/" class="">Clickhouse</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/iceberg/iceberg/" class="">Iceberg</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/streamingBatchIntegration/" class="active">批流一体</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/realtimeDataWarehouse/realtimeDataWarehouse/" class="">实时数仓</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E8%AE%A1%E7%AE%97/bigDataComputing/bigDataComputing/" class="">大数据 计算Computing</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/elasticsearchModel/elasticsearchModel/" class="">Elasticsearch 数据模型Model</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/olap/olap/" class="">OLAP 在线分析处理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/hbaseHotkey/hbaseHotkey/" class="">HBase Hotkey-预分区和Rowkey设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/hbase/hbase/" class="">HBase总结</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/bigDataStorage/bigDataStorage/" class="">大数据存储</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/elasticsearchDistributed/elasticsearchDistributed/" class="">Elasticsearch 分布式集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/elasticsearch/elasticsearch/" class="">Elasticsearch基础(ES)</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/hdfs/hdfs/" class="">HDFS NameNode HA 解决方案</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/www6vBigData/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>批流一体</h3>
+
+  <label for="toc-control">
+    
+    <img src="/www6vBigData/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#数据湖--vs-数据仓库1">数据湖  vs 数据仓库[1]</a></li>
+    <li><a href="#湖仓一体">湖仓一体</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><p></p>
+<!-- more -->
+<h1 id="数据湖--vs-数据仓库1">
+  数据湖  vs 数据仓库[1]
+  <a class="anchor" href="#%e6%95%b0%e6%8d%ae%e6%b9%96--vs-%e6%95%b0%e6%8d%ae%e4%bb%93%e5%ba%931">#</a>
+</h1>
+<table>
+  <thead>
+      <tr>
+          <th>特性</th>
+          <th>数据仓库</th>
+          <th>数据湖</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>数据</strong></td>
+          <td>来自事务系统、运营数据库和业务线应用程序的关系数据</td>
+          <td>来自 IoT 设备、网站、移动应用程序、社交媒体和企业应用程序的非关系和关系数据</td>
+      </tr>
+      <tr>
+          <td><strong>Schema</strong></td>
+          <td>设计在数据仓库实施之前（写入型 Schema）</td>
+          <td>写入在分析时（读取型 Schema）</td>
+      </tr>
+      <tr>
+          <td><strong>性价比</strong></td>
+          <td>更快查询结果会带来较高存储成本</td>
+          <td>更快查询结果只需较低存储成本</td>
+      </tr>
+      <tr>
+          <td><strong>数据质量</strong></td>
+          <td>可作为重要事实依据的高度监管数据</td>
+          <td>任何可以或无法进行监管的数据（例如原始数据）</td>
+      </tr>
+      <tr>
+          <td><strong>用户</strong></td>
+          <td>业务分析师</td>
+          <td>数据科学家、数据开发人员和业务分析师（使用监管数据）</td>
+      </tr>
+      <tr>
+          <td><strong>分析</strong></td>
+          <td>批处理报告、BI 和可视化</td>
+          <td>机器学习、预测分析、数据发现和分析</td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="湖仓一体">
+  湖仓一体
+  <a class="anchor" href="#%e6%b9%96%e4%bb%93%e4%b8%80%e4%bd%93">#</a>
+</h1>
+<h1 id="参考">
+  参考
+  <a class="anchor" href="#%e5%8f%82%e8%80%83">#</a>
+</h1>
+<ol>
+<li>
+<p><a href="https://aws.amazon.com/cn/big-data/datalakes-and-analytics/what-is-a-data-lake/">什么是数据湖？</a> AWS</p>
+</li>
+<li>
+<p><a href="https://developer.aliyun.com/article/706954">大数据架构如何做到流批一体？</a></p>
+</li>
+</ol>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#数据湖--vs-数据仓库1">数据湖  vs 数据仓库[1]</a></li>
+    <li><a href="#湖仓一体">湖仓一体</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

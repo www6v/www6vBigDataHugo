@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head><script src="/www6vBigData/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=www6vBigData/livereload" data-no-instant defer></script>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+
+
+  目录
+  #
+
+
+
+  架构 [5]
+  #
+
+{% asset_img &lsquo;arch.jpg&rsquo; %}
+图中底层蓝色的部分是数据处理计算部分，依托于存储与计算分离的特性以及预计算能力， 很好地满足在海量数据场景下的数据高效计算能力。同时提供了完善的企业级平台运维处理能力，支持多种架构满足各类客户的场景需求。
+往上，通过多维数据模型框架，对用户基础数据进行语义分类和转化，提供多种维度分类的数据主题模型。基于这些数据主题模型，就可以直接对接应用分析端进行常用的事件分析，漏斗分析，留存分析。
+
+  完整链路 [4]
+  #
+
+{% asset_img &lsquo;flow.jpg&rsquo; %}
+埋点 -&gt; 使用app -&gt; 数据上报 -&gt; 数据模型 -&gt; 行为分析
+
+  指标 [2]
+  #
+
+
+  粘性指标
+  #
+
+
+关注用户周期内持续访问的情况
+新用户数与比例、活跃用户数与比例、用户转化率、用户留存率、用户流失率、用户访问率
+
+
+  活跃指标
+  #
+
+
+用户访问的参与度
+活跃用户、新增用户、回访用户、流失用户、平均停留时长、使用频率
+
+
+  产出指标
+  #
+
+
+用户创造的直接价值输出
+页面浏览数PV、独立访客数UV、点击次数、消费频次、消费金额
+
+
+  用户行为分析
+  #
+
+
+  常用方法 [1] [2] [4] [6]
+  #
+
+
+
+动作分析
+
+行为事件分析
+页面点击分析
+
+
+
+转化分析">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://localhost:1313/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/userBehaviorAnalysis/">
+  <meta property="og:site_name" content="BigData">
+  <meta property="og:title" content="用户行为分析">
+  <meta property="og:description" content="目录 # 架构 [5] # {% asset_img ‘arch.jpg’ %}
+图中底层蓝色的部分是数据处理计算部分，依托于存储与计算分离的特性以及预计算能力， 很好地满足在海量数据场景下的数据高效计算能力。同时提供了完善的企业级平台运维处理能力，支持多种架构满足各类客户的场景需求。
+往上，通过多维数据模型框架，对用户基础数据进行语义分类和转化，提供多种维度分类的数据主题模型。基于这些数据主题模型，就可以直接对接应用分析端进行常用的事件分析，漏斗分析，留存分析。
+完整链路 [4] # {% asset_img ‘flow.jpg’ %}
+埋点 -&gt; 使用app -&gt; 数据上报 -&gt; 数据模型 -&gt; 行为分析
+指标 [2] # 粘性指标 # 关注用户周期内持续访问的情况 新用户数与比例、活跃用户数与比例、用户转化率、用户留存率、用户流失率、用户访问率 活跃指标 # 用户访问的参与度 活跃用户、新增用户、回访用户、流失用户、平均停留时长、使用频率 产出指标 # 用户创造的直接价值输出 页面浏览数PV、独立访客数UV、点击次数、消费频次、消费金额 用户行为分析 # 常用方法 [1] [2] [4] [6] # 动作分析
+行为事件分析 页面点击分析 转化分析">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:published_time" content="2022-09-15T13:30:09+00:00">
+    <meta property="article:modified_time" content="2022-09-15T13:30:09+00:00">
+    <meta property="article:tag" content="用户行为分析">
+<title>用户行为分析 | BigData</title>
+<link rel="icon" href="/www6vBigData/favicon.png" >
+<link rel="manifest" href="/www6vBigData/manifest.json">
+<link rel="canonical" href="http://localhost:1313/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/userBehaviorAnalysis/">
+<link rel="stylesheet" href="/www6vBigData/book.min.3257a7ce7c061eb5dfc72257c356229b1470dc77ce9b982ac220c02542f9f04f.css" integrity="sha256-MlenznwGHrXfxyJXw1YimxRw3HfOm5gqwiDAJUL58E8=" crossorigin="anonymous">
+  <script defer src="/www6vBigData/fuse.min.js"></script>
+  <script defer src="/www6vBigData/en.search.min.4f7918a64d89a2285560265e86b738f9d612a4a293091d00f11d9d3d23c9cd5b.js" integrity="sha256-T3kYpk2JoihVYCZehrc4&#43;dYSpKKTCR0A8R2dPSPJzVs=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/www6vBigData/"><span>BigData</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/dataMiddlePlatform/dataMiddlePlatform/" class="">数据中台</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/personProflie/personProflie/" class="">用户画像</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataSummary/" class="">大数据  汇总</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/userBehaviorAnalysis/" class="active">用户行为分析</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E8%AE%A1%E7%AE%97/bigDataSchedule/" class="">大数据 调度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/bigDataMetaMgt/" class="">大数据 元数据管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/clickhouse/" class="">Clickhouse</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/iceberg/" class="">Iceberg</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/streamingBatchIntegration/" class="">批流一体</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/realtimeDataWarehouse/realtimeDataWarehouse/" class="">实时数仓</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E8%AE%A1%E7%AE%97/bigDataComputing/" class="">大数据 计算Computing</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/elasticsearchModel/" class="">Elasticsearch 数据模型Model</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%B9%B3%E5%8F%B0/olap/" class="">OLAP 在线分析处理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/hbaseHotkey/hbaseHotkey/" class="">HBase Hotkey-预分区和Rowkey设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/hbase/hbase/" class="">HBase总结</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/bigDataStorage/" class="">大数据存储</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/elasticsearchDistributed/" class="">Elasticsearch 分布式集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/elasticsearch/elasticsearch/" class="">Elasticsearch基础(ES)</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/%E5%AD%98%E5%82%A8/hdfs/" class="">HDFS NameNode HA 解决方案</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/www6vBigData/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>用户行为分析</h3>
+
+  <label for="toc-control">
+    
+    <img src="/www6vBigData/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#目录">目录</a></li>
+      </ul>
+    </li>
+    <li><a href="#架构-5">架构 [5]</a></li>
+    <li><a href="#完整链路-4">完整链路 [4]</a></li>
+    <li><a href="#指标-2">指标 [2]</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#粘性指标">粘性指标</a></li>
+            <li><a href="#活跃指标">活跃指标</a></li>
+            <li><a href="#产出指标">产出指标</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#用户行为分析">用户行为分析</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#常用方法-1-2-4-6">常用方法 [1] [2] [4] [6]</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#漏斗模型分析">漏斗模型分析</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#需求场景-9">需求场景 [9]</a></li>
+            <li><a href="#漏斗类型">漏斗类型</a></li>
+            <li><a href="#整体流程">整体流程</a></li>
+            <li><a href="#aarrr漏斗模型-1-3">AARRR漏斗模型 [1] [3]</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#路径分析">路径分析</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#转化率计算">转化率计算</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#采集用户行为数据-2">采集用户行为数据 [2]</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#平台设置埋点-6-10">平台设置埋点 [6] [10]</a></li>
+            <li><a href="#第三方统计工具">第三方统计工具</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><p></p>
+<!-- more -->
+<h2 id="目录">
+  目录
+  <a class="anchor" href="#%e7%9b%ae%e5%bd%95">#</a>
+</h2>
+<!-- toc -->
+<h1 id="架构-5">
+  架构 [5]
+  <a class="anchor" href="#%e6%9e%b6%e6%9e%84-5">#</a>
+</h1>
+<p>{% asset_img &lsquo;arch.jpg&rsquo; %}</p>
+<p>图中底层蓝色的部分是数据处理计算部分，依托于存储与计算分离的特性以及预计算能力， 很好地满足在海量数据场景下的数据高效计算能力。同时提供了完善的企业级平台运维处理能力，支持多种架构满足各类客户的场景需求。</p>
+<p>往上，通过多维数据模型框架，对用户基础数据进行语义分类和转化，提供多种维度分类的数据主题模型。基于这些数据主题模型，就可以直接对接应用分析端进行常用的事件分析，漏斗分析，留存分析。</p>
+<h1 id="完整链路-4">
+  完整链路 [4]
+  <a class="anchor" href="#%e5%ae%8c%e6%95%b4%e9%93%be%e8%b7%af-4">#</a>
+</h1>
+<p>{% asset_img &lsquo;flow.jpg&rsquo; %}</p>
+<p>埋点 -&gt; 使用app -&gt; 数据上报 -&gt; 数据模型 -&gt; 行为分析</p>
+<h1 id="指标-2">
+  指标 [2]
+  <a class="anchor" href="#%e6%8c%87%e6%a0%87-2">#</a>
+</h1>
+<h3 id="粘性指标">
+  粘性指标
+  <a class="anchor" href="#%e7%b2%98%e6%80%a7%e6%8c%87%e6%a0%87">#</a>
+</h3>
+<ul>
+<li>关注用户周期内持续访问的情况
+新用户数与比例、活跃用户数与比例、用户转化率、用户留存率、用户流失率、用户访问率</li>
+</ul>
+<h3 id="活跃指标">
+  活跃指标
+  <a class="anchor" href="#%e6%b4%bb%e8%b7%83%e6%8c%87%e6%a0%87">#</a>
+</h3>
+<ul>
+<li>用户访问的参与度
+活跃用户、新增用户、回访用户、流失用户、平均停留时长、使用频率</li>
+</ul>
+<h3 id="产出指标">
+  产出指标
+  <a class="anchor" href="#%e4%ba%a7%e5%87%ba%e6%8c%87%e6%a0%87">#</a>
+</h3>
+<ul>
+<li>用户创造的直接价值输出
+页面浏览数PV、独立访客数UV、点击次数、消费频次、消费金额</li>
+</ul>
+<h1 id="用户行为分析">
+  用户行为分析
+  <a class="anchor" href="#%e7%94%a8%e6%88%b7%e8%a1%8c%e4%b8%ba%e5%88%86%e6%9e%90">#</a>
+</h1>
+<h3 id="常用方法-1-2-4-6">
+  常用方法 [1] [2] [4] [6]
+  <a class="anchor" href="#%e5%b8%b8%e7%94%a8%e6%96%b9%e6%b3%95-1-2-4-6">#</a>
+</h3>
+<ul>
+<li>
+<p>动作分析</p>
+<ul>
+<li>行为事件分析</li>
+<li>页面点击分析</li>
+</ul>
+</li>
+<li>
+<p>转化分析</p>
+<ul>
+<li><strong>漏斗模型分析</strong> [7] [9]</li>
+<li><strong>用户行为路径分析</strong> [7][11]</li>
+</ul>
+</li>
+<li>
+<p>用户分析</p>
+<ul>
+<li><strong>用户留存分析</strong> [7] [8]</li>
+<li><strong>用户分群分析</strong>
+用户画像（基本属性、用户偏好、生活习惯、用户行为等）的标签信息将用户分群</li>
+</ul>
+</li>
+<li>
+<p>福格模型分析</p>
+</li>
+</ul>
+<p>{% asset_img  &lsquo;application.jpg&rsquo;  %}</p>
+<h1 id="漏斗模型分析">
+  漏斗模型分析
+  <a class="anchor" href="#%e6%bc%8f%e6%96%97%e6%a8%a1%e5%9e%8b%e5%88%86%e6%9e%90">#</a>
+</h1>
+<h3 id="需求场景-9">
+  需求场景 [9]
+  <a class="anchor" href="#%e9%9c%80%e6%b1%82%e5%9c%ba%e6%99%af-9">#</a>
+</h3>
+<p>定位用户流失具体原因</p>
+<p>针对不同版本，转化率情况对比</p>
+<p>检测某个专题活动效果</p>
+<h3 id="漏斗类型">
+  漏斗类型
+  <a class="anchor" href="#%e6%bc%8f%e6%96%97%e7%b1%bb%e5%9e%8b">#</a>
+</h3>
+<p>无序漏斗：在漏斗的周期内，不限定漏斗多个步骤之间事件发生的顺序。
+有序漏斗：在漏斗的周期内，严格限定漏斗每个步骤之间的发生顺序。</p>
+<h3 id="整体流程">
+  整体流程
+  <a class="anchor" href="#%e6%95%b4%e4%bd%93%e6%b5%81%e7%a8%8b">#</a>
+</h3>
+<ul>
+<li>确定转化路径</li>
+<li>分析流失原因</li>
+<li>优化关键因子</li>
+</ul>
+<h3 id="aarrr漏斗模型-1-3">
+  AARRR漏斗模型 [1] [3]
+  <a class="anchor" href="#aarrr%e6%bc%8f%e6%96%97%e6%a8%a1%e5%9e%8b-1-3">#</a>
+</h3>
+<ul>
+<li>实现用户增长的5个指标
+<ul>
+<li>Acquisition（获取）：指的是用户从各种渠道进入产品的过程。</li>
+<li>Activation（激活）：指的是用户开始使用产品，并完成核心操作的过程。</li>
+<li>Retention（留存）：指的是用户在完成激活后，继续使用产品，并形成一定程度的用户粘性。</li>
+<li>Revenue（收入）：指的是用户在使用产品后，产生的实际收益。</li>
+<li>Referral（自传播）：指的是用户在使用产品后，愿意将产品推荐给他人，形成口碑和自然增长。</li>
+</ul>
+</li>
+</ul>
+<h1 id="路径分析">
+  路径分析
+  <a class="anchor" href="#%e8%b7%af%e5%be%84%e5%88%86%e6%9e%90">#</a>
+</h1>
+<h3 id="转化率计算">
+  转化率计算
+  <a class="anchor" href="#%e8%bd%ac%e5%8c%96%e7%8e%87%e8%ae%a1%e7%ae%97">#</a>
+</h3>
+<p>页面转化率
+路径转化率</p>
+<h1 id="采集用户行为数据-2">
+  采集用户行为数据 [2]
+  <a class="anchor" href="#%e9%87%87%e9%9b%86%e7%94%a8%e6%88%b7%e8%a1%8c%e4%b8%ba%e6%95%b0%e6%8d%ae-2">#</a>
+</h1>
+<h3 id="平台设置埋点-6-10">
+  平台设置埋点 [6] [10]
+  <a class="anchor" href="#%e5%b9%b3%e5%8f%b0%e8%ae%be%e7%bd%ae%e5%9f%8b%e7%82%b9-6-10">#</a>
+</h3>
+<h3 id="第三方统计工具">
+  第三方统计工具
+  <a class="anchor" href="#%e7%ac%ac%e4%b8%89%e6%96%b9%e7%bb%9f%e8%ae%a1%e5%b7%a5%e5%85%b7">#</a>
+</h3>
+<p>国内： 百度统计,  CNZZ统计,  GrowingIO,  诸葛IO,  神策IO,  友盟
+国外：Google Analytics,   Thinking Analytics, Mixpanel, Heap</p>
+<h1 id="参考">
+  参考
+  <a class="anchor" href="#%e5%8f%82%e8%80%83">#</a>
+</h1>
+<ol>
+<li><a href="https://blog.csdn.net/Sake360/article/details/120350080">用户行为分析</a></li>
+<li><a href="https://baijiahao.baidu.com/s?id=1653670195355016641&amp;wfr=spider&amp;for=pc">用户研究：如何做用户行为分析？</a></li>
+<li><a href="https://blog.csdn.net/WindyQCF/article/details/123911538">万字详解用户行为分析</a></li>
+<li><a href="https://baijiahao.baidu.com/s?id=1663323869315685791&amp;wfr=spider&amp;for=pc">用户行为分析是什么？怎么做？</a></li>
+<li><a href="https://www.infoq.cn/article/xZYe1DUopNA9CzLwau3O">数十亿用户数据，上千个用户标签维度，用户分析怎么做？</a> ***
+<a href="https://mp.weixin.qq.com/s?__biz=MzIyNTIyNTYwOA==&amp;mid=2651010996&amp;idx=1&amp;sn=f7ba207a991d595036a11fc3b6797bac">活动回顾 | 数十亿用户数据，上千个用户标签维度，用户分析怎么做？</a>  kylin</li>
+<li><a href="https://www.infoq.cn/article/yGOh38XjpYdTKMJjzjoH">如何实现用户行为的动态采集与分析</a></li>
+<li><a href="https://www.infoq.cn/article/ecmRgdfrjFl1U3hAd59b">如何基于 Apache Doris 构建简易高效的用户行为分析平台？</a>
+<a href="https://www.infoq.cn/article/SoCIclCLD8f4vSzLB4dX">如何基于 Apache Doris 构建简易高效的用户行为分析平台？</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzI4NjY4MTU5Nw==&amp;mid=2247490504&amp;idx=1&amp;sn=9827b136fa5cfc81467cb1b795f7bc41">用户行为分析模型实践（一）—— 路径分析模型</a>  vivo</li>
+<li><a href="https://xie.infoq.cn/article/f305ea8be1935540432aca0d0">用户行为分析模型实践（二）—— 漏斗分析模型</a>  vivo</li>
+<li><a href="https://xie.infoq.cn/article/1163e5781f37b4e55a2c43c70">用户行为分析模型实践（三）——H5 通用分析模型</a></li>
+<li><a href="https://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&amp;mid=2247486360&amp;idx=1&amp;sn=85504543498dfc82e5e720b77faa602d">基于Spark的用户行为路径分析的产品化实践</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/146639831">【分析框架】用户行为分析</a> *** 未</li>
+<li><a href="https://zhuanlan.zhihu.com/p/133962465">淘宝用户行为分析（附Python源码）</a> *** 未</li>
+</ol>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#目录">目录</a></li>
+      </ul>
+    </li>
+    <li><a href="#架构-5">架构 [5]</a></li>
+    <li><a href="#完整链路-4">完整链路 [4]</a></li>
+    <li><a href="#指标-2">指标 [2]</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#粘性指标">粘性指标</a></li>
+            <li><a href="#活跃指标">活跃指标</a></li>
+            <li><a href="#产出指标">产出指标</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#用户行为分析">用户行为分析</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#常用方法-1-2-4-6">常用方法 [1] [2] [4] [6]</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#漏斗模型分析">漏斗模型分析</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#需求场景-9">需求场景 [9]</a></li>
+            <li><a href="#漏斗类型">漏斗类型</a></li>
+            <li><a href="#整体流程">整体流程</a></li>
+            <li><a href="#aarrr漏斗模型-1-3">AARRR漏斗模型 [1] [3]</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#路径分析">路径分析</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#转化率计算">转化率计算</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#采集用户行为数据-2">采集用户行为数据 [2]</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#平台设置埋点-6-10">平台设置埋点 [6] [10]</a></li>
+            <li><a href="#第三方统计工具">第三方统计工具</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

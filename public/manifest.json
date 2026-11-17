@@ -1,0 +1,15 @@
+{
+  "name": "BigData",
+  "short_name": "BigData",
+  "start_url": "/www6vBigData/",
+  "scope": "/www6vBigData/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/www6vBigData/favicon.svg",
+      "sizes": "512x512"
+    }
+  ]
+}

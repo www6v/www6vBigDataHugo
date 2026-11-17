@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head><script src="/www6vBigData/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=www6vBigData/livereload" data-no-instant defer></script>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="
+
+
+  目录
+  #
+
+
+
+  目标
+  #
+
+Region自动split有数据倾斜问题，所以要预分区。
+热的Region会有更多的读/写请求流入， 造成RegionServer的不稳定和更多的资源消耗（eg. gc 时间长）。
+
+  Rowkey设计的原则
+  #
+
+
+散列性
+集中性
+唯一性
+
+
+  Row_key设计 防止热点的三种方法
+  #
+
+
+  Hash (通用)
+  #
+
+十进制_年月日小时分秒_订单号
+xx_20200101010101_364758  
+xx_20200101010101_585775
+xx_20200101010101_385748  
+
+3个分区
+xx = hash（年月日小时分秒，订单号）% 分区数
+
+  Reversing
+  #
+
+倒序时间戳
+一个数据库处理的通常问题是找到最近版本的值。采用倒序时间戳作为键的一部分可以对此特定情况有很大帮助。该技术包含追加( Long.MAX_VALUE - timestamp ) 到key的后面，如 [key][reverse_timestamp] 。
+**表内[key]的最近的值可以用[key]进行Scan，找到并获取第一个记录。**由于HBase行键是排序的，该键排在任何比它老的行键的前面，所以是第一个。
+该技术可以用于代替版本数，其目的是保存所有版本到“永远”(或一段很长时间) 。同时，采用同样的Scan技术，可以很快获取其他版本。
+Rowkey: reverse(order_id) &#43; (MAX_LONG – timestamp)
+Columns: 该订单各种状态
+2021010101010101 -&gt; 101010101010101202
+20210202020202 -&gt; 2020202020201202
+20210303030303 -&gt; 3030303030301202
+
+  Salt
+  #
+
+
+
+对get、put友好，对scan操作并不友好">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#343a40">
+<meta name="color-scheme" content="light dark"><meta property="og:url" content="http://localhost:1313/www6vBigData/docs/hbaseHotkey/">
+  <meta property="og:site_name" content="BigData">
+  <meta property="og:title" content="HBase Hotkey-预分区和Rowkey设计">
+  <meta property="og:description" content="目录 # 目标 # Region自动split有数据倾斜问题，所以要预分区。
+热的Region会有更多的读/写请求流入， 造成RegionServer的不稳定和更多的资源消耗（eg. gc 时间长）。
+Rowkey设计的原则 # 散列性 集中性 唯一性 Row_key设计 防止热点的三种方法 # Hash (通用) # 十进制_年月日小时分秒_订单号 xx_20200101010101_364758 xx_20200101010101_585775 xx_20200101010101_385748 3个分区 xx = hash（年月日小时分秒，订单号）% 分区数 Reversing # 倒序时间戳
+一个数据库处理的通常问题是找到最近版本的值。采用倒序时间戳作为键的一部分可以对此特定情况有很大帮助。该技术包含追加( Long.MAX_VALUE - timestamp ) 到key的后面，如 [key][reverse_timestamp] 。
+**表内[key]的最近的值可以用[key]进行Scan，找到并获取第一个记录。**由于HBase行键是排序的，该键排在任何比它老的行键的前面，所以是第一个。
+该技术可以用于代替版本数，其目的是保存所有版本到“永远”(或一段很长时间) 。同时，采用同样的Scan技术，可以很快获取其他版本。
+Rowkey: reverse(order_id) &#43; (MAX_LONG – timestamp) Columns: 该订单各种状态 2021010101010101 -&gt; 101010101010101202 20210202020202 -&gt; 2020202020201202 20210303030303 -&gt; 3030303030301202 Salt # 对get、put友好，对scan操作并不友好">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="docs">
+    <meta property="article:published_time" content="2021-06-07T15:24:59+00:00">
+    <meta property="article:modified_time" content="2021-06-07T15:24:59+00:00">
+    <meta property="article:tag" content="Hbase">
+<title>HBase Hotkey-预分区和Rowkey设计 | BigData</title>
+<link rel="icon" href="/www6vBigData/favicon.png" >
+<link rel="manifest" href="/www6vBigData/manifest.json">
+<link rel="canonical" href="http://localhost:1313/www6vBigData/docs/hbaseHotkey/">
+<link rel="stylesheet" href="/www6vBigData/book.min.3257a7ce7c061eb5dfc72257c356229b1470dc77ce9b982ac220c02542f9f04f.css" integrity="sha256-MlenznwGHrXfxyJXw1YimxRw3HfOm5gqwiDAJUL58E8=" crossorigin="anonymous">
+  <script defer src="/www6vBigData/fuse.min.js"></script>
+  <script defer src="/www6vBigData/en.search.min.69fe2374d659add0d49a6da4c50a717a6f5e11eb76489c42c1d4b0621eea5511.js" integrity="sha256-af4jdNZZrdDUmm2kxQpxem9eEet2SJxCwdSwYh7qVRE=" crossorigin="anonymous"></script>
+<!--
+Made with Book Theme
+https://github.com/alex-shpak/hugo-book
+-->
+  
+</head>
+<body dir="ltr">
+  <input type="checkbox" class="hidden toggle" id="menu-control" />
+  <input type="checkbox" class="hidden toggle" id="toc-control" />
+  <main class="container flex">
+    <aside class="book-menu">
+      <div class="book-menu-content">
+        
+  <nav>
+<h2 class="book-brand">
+  <a class="flex align-center" href="/www6vBigData/"><span>BigData</span>
+  </a>
+</h2>
+
+
+<div class="book-search hidden">
+  <input type="text" id="book-search-input" placeholder="Search" aria-label="Search" maxlength="64" data-hotkeys="s/" />
+  <div class="book-search-spinner hidden"></div>
+  <ul id="book-search-results"></ul>
+</div>
+<script>document.querySelector(".book-search").classList.remove("hidden")</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <ul>
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/hbaselsmTree/" class="">HBase - LSM-Tree</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/dataMiddlePlatform/" class="">数据中台</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/personProflie/" class="">用户画像</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataSummary/" class="">大数据  汇总</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/userBehaviorAnalysis/" class="">用户行为分析</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataSchedule/" class="">大数据 调度</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataMetaMgt/" class="">大数据 元数据管理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/clickhouse/" class="">Clickhouse</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/iceberg/" class="">Iceberg</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/streamingBatchIntegration/" class="">批流一体</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/realtimeDataWarehouse/" class="">实时数仓</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataComputing/" class="">大数据 计算Computing</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/elasticsearchModel/" class="">Elasticsearch 数据模型Model</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/olap/" class="">OLAP 在线分析处理</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/hbaseHotkey/" class="active">HBase Hotkey-预分区和Rowkey设计</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/hbase/" class="">HBase总结</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/bigDataStorage/" class="">大数据存储</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/elasticsearchDistributed/" class="">Elasticsearch 分布式集群</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/elasticsearch/" class="">Elasticsearch基础(ES)</a>
+  
+
+        </li>
+      
+    
+      
+        <li>
+          
+  
+  
+
+  
+    <a href="/www6vBigData/docs/hdfs/" class="">HDFS NameNode HA 解决方案</a>
+  
+
+        </li>
+      
+    
+  </ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</nav>
+
+
+
+
+  <script>(function(){var e=document.querySelector("aside .book-menu-content");addEventListener("beforeunload",function(){localStorage.setItem("menu.scrollTop",e.scrollTop)}),e.scrollTop=localStorage.getItem("menu.scrollTop")})()</script>
+
+
+ 
+      </div>
+    </aside>
+
+    <div class="book-page">
+      <header class="book-header">
+        
+  <div class="flex align-center justify-between">
+  <label for="menu-control">
+    <img src="/www6vBigData/svg/menu.svg" class="book-icon" alt="Menu" />
+  </label>
+
+  <h3>HBase Hotkey-预分区和Rowkey设计</h3>
+
+  <label for="toc-control">
+    
+    <img src="/www6vBigData/svg/toc.svg" class="book-icon" alt="Table of Contents" />
+    
+  </label>
+</div>
+
+
+  
+  <aside class="hidden clearfix">
+    
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#目录">目录</a></li>
+      </ul>
+    </li>
+    <li><a href="#目标">目标</a></li>
+    <li><a href="#rowkey设计的原则">Rowkey设计的原则</a></li>
+    <li><a href="#row_key设计-防止热点的三种方法">Row_key设计 防止热点的三种方法</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#hash-通用">Hash (通用)</a></li>
+            <li><a href="#reversing">Reversing</a></li>
+            <li><a href="#salt">Salt</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#hbase-sdk与预分区-相关的参数">HBase SDK与预分区 相关的参数</a></li>
+    <li><a href="#分区数建议">分区数建议</a></li>
+    <li><a href="#可配置的分区数">可配置的分区数</a></li>
+    <li><a href="#已有表负载不均衡的表迁移到新的表-暂时不做">已有表（负载不均衡的表）迁移到新的表-暂时不做</a></li>
+    <li><a href="#总结">总结</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+
+  </aside>
+  
+ 
+      </header>
+
+      
+      
+  <article class="markdown book-article"><p></p>
+<!-- more -->
+<h2 id="目录">
+  目录
+  <a class="anchor" href="#%e7%9b%ae%e5%bd%95">#</a>
+</h2>
+<!-- toc -->
+<h1 id="目标">
+  目标
+  <a class="anchor" href="#%e7%9b%ae%e6%a0%87">#</a>
+</h1>
+<p>Region自动split有<strong>数据倾斜</strong>问题，所以要<strong>预分区</strong>。</p>
+<p>热的Region会有更多的读/写请求流入， 造成RegionServer的不稳定和更多的资源消耗（eg. gc 时间长）。</p>
+<h1 id="rowkey设计的原则">
+  Rowkey设计的原则
+  <a class="anchor" href="#rowkey%e8%ae%be%e8%ae%a1%e7%9a%84%e5%8e%9f%e5%88%99">#</a>
+</h1>
+<ul>
+<li>散列性</li>
+<li>集中性</li>
+<li>唯一性</li>
+</ul>
+<h1 id="row_key设计-防止热点的三种方法">
+  Row_key设计 防止热点的三种方法
+  <a class="anchor" href="#row_key%e8%ae%be%e8%ae%a1-%e9%98%b2%e6%ad%a2%e7%83%ad%e7%82%b9%e7%9a%84%e4%b8%89%e7%a7%8d%e6%96%b9%e6%b3%95">#</a>
+</h1>
+<h3 id="hash-通用">
+  Hash (通用)
+  <a class="anchor" href="#hash-%e9%80%9a%e7%94%a8">#</a>
+</h3>
+<pre tabindex="0"><code>十进制_年月日小时分秒_订单号
+xx_20200101010101_364758  
+xx_20200101010101_585775
+xx_20200101010101_385748  
+
+3个分区
+xx = hash（年月日小时分秒，订单号）% 分区数
+</code></pre><h3 id="reversing">
+  Reversing
+  <a class="anchor" href="#reversing">#</a>
+</h3>
+<p><strong>倒序时间戳</strong></p>
+<p>一个数据库处理的通常问题是找到最近版本的值。采用倒序时间戳作为键的一部分可以对此特定情况有很大帮助。该技术包含追加( Long.MAX_VALUE - timestamp ) 到key的后面，如 [key][reverse_timestamp] 。</p>
+<p>**表内[key]的最近的值可以用[key]进行Scan，找到并获取第一个记录。**由于HBase行键是排序的，该键排在任何比它老的行键的前面，所以是第一个。</p>
+<p>该技术可以用于代替版本数，其目的是保存所有版本到“永远”(或一段很长时间) 。<strong>同时，采用同样的Scan技术，可以很快获取其他版本。</strong></p>
+<pre tabindex="0"><code>Rowkey: reverse(order_id) + (MAX_LONG – timestamp)
+Columns: 该订单各种状态
+</code></pre><pre tabindex="0"><code>2021010101010101 -&gt; 101010101010101202
+20210202020202 -&gt; 2020202020201202
+20210303030303 -&gt; 3030303030301202
+</code></pre><h3 id="salt">
+  Salt
+  <a class="anchor" href="#salt">#</a>
+</h3>
+<ul>
+<li>
+<p>对get、put友好，对scan操作并不友好</p>
+</li>
+<li>
+<p>有热点就要打散，但打散就难以做范围查询。因此，要同时满足这对相互矛盾的需求，<strong>必须有一种折中的方案：既能在一定程度上打散，又能保证一定程度的有序。</strong></p>
+</li>
+</ul>
+<p>这个解决方案就是加盐，其实叫分桶(salt buckets)更准确。<strong>数据在桶内保序，桶之间随机。</strong></p>
+<p>写入时按桶个数取模，数据随机落在某个桶里，保证写请求在桶之间是均衡的。查询时读取所有的桶来保证结果集的有序和完备。</p>
+<pre tabindex="0"><code>加盐的过程就是在原来key的基础上增加一个byte作为前缀,计算公式如下：
+new_row_key = ((byte) (hash(key) % BUCKETS_NUMBER) + original_key
+</code></pre><p>{% asset_img &lsquo;h-1.png&rsquo;  %}</p>
+<h1 id="hbase-sdk与预分区-相关的参数">
+  HBase SDK与预分区 相关的参数
+  <a class="anchor" href="#hbase-sdk%e4%b8%8e%e9%a2%84%e5%88%86%e5%8c%ba-%e7%9b%b8%e5%85%b3%e7%9a%84%e5%8f%82%e6%95%b0">#</a>
+</h1>
+<ul>
+<li>其中 NUMREGIONS 为 <strong>region的个数</strong>，一般按<strong>每个region 6~8GB左右</strong>来计算region数量，集群规模大，region数量可以适当取大一些</li>
+<li>SPLITALGO 为 rowkey分割的算法：Hbase自带了三种pre-split的算法，分别是 HexStringSplit、DecimalStringSplit 和 UniformSplit。</li>
+</ul>
+<p>各种Split算法适用场景：</p>
+<ul>
+<li><strong>HexStringSplit</strong>: rowkey是<strong>十六进制</strong>的字符串作为前缀的 （MD5编码为16进制的rowkey）</li>
+<li><strong>DecimalStringSplit</strong>: rowkey是<strong>10进制</strong>数字字符串作为前缀的</li>
+<li>UniformSplit: rowkey前缀完全随机 （hash算法转换为字节数组的rowkey）</li>
+</ul>
+<h1 id="分区数建议">
+  分区数建议
+  <a class="anchor" href="#%e5%88%86%e5%8c%ba%e6%95%b0%e5%bb%ba%e8%ae%ae">#</a>
+</h1>
+<table>
+  <thead>
+      <tr>
+          <th>表</th>
+          <th>分区数建议，表大小</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>小表（&lt;50G）</td>
+          <td>5～10个分区</td>
+      </tr>
+      <tr>
+          <td>大表（500G～10T）</td>
+          <td>表的大小/10G, 最大120个分区<br> eg. 1T/10G = 100个分区</td>
+      </tr>
+  </tbody>
+</table>
+<table>
+  <thead>
+      <tr>
+          <th>吞吐</th>
+          <th>有sacn需求</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>吞吐高， 分区数相应多<br/>吞吐低， 分区数相应低</td>
+          <td>分区要控制在一定范围</td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="可配置的分区数">
+  可配置的分区数
+  <a class="anchor" href="#%e5%8f%af%e9%85%8d%e7%bd%ae%e7%9a%84%e5%88%86%e5%8c%ba%e6%95%b0">#</a>
+</h1>
+<ol>
+<li>Portal里可以配置hbase 表的分区数， 配置的值存储在zk中。</li>
+<li>在建立表的时候读取预先存储好的分区数， 做到建表时自动分区。</li>
+<li>sdk 里读取预先存储好的分区数，保证负载均匀的写入Region。</li>
+</ol>
+<h1 id="已有表负载不均衡的表迁移到新的表-暂时不做">
+  已有表（负载不均衡的表）迁移到新的表-暂时不做
+  <a class="anchor" href="#%e5%b7%b2%e6%9c%89%e8%a1%a8%e8%b4%9f%e8%bd%bd%e4%b8%8d%e5%9d%87%e8%a1%a1%e7%9a%84%e8%a1%a8%e8%bf%81%e7%a7%bb%e5%88%b0%e6%96%b0%e7%9a%84%e8%a1%a8-%e6%9a%82%e6%97%b6%e4%b8%8d%e5%81%9a">#</a>
+</h1>
+<p>老的表的rowkey清洗一遍存入新的表中。</p>
+<h1 id="总结">
+  总结
+  <a class="anchor" href="#%e6%80%bb%e7%bb%93">#</a>
+</h1>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>put，get</th>
+          <th>scan</th>
+          <th>通用性</th>
+          <th>结果</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>Salt</strong></td>
+          <td>友好</td>
+          <td>不友好<br/>多个Re<strong>gion的多路归并算法</strong></td>
+          <td>通用</td>
+          <td>SDK（方式2-salt）</td>
+      </tr>
+      <tr>
+          <td><strong>Reversing</strong></td>
+          <td>友好</td>
+          <td>友好<br/>相同rowkey的会存储在一起</td>
+          <td>和业务相关</td>
+          <td>SDK（方式3-自定义）</td>
+      </tr>
+  </tbody>
+</table>
+<h1 id="参考">
+  参考
+  <a class="anchor" href="#%e5%8f%82%e8%80%83">#</a>
+</h1>
+<ol>
+<li><a href="https://blog.csdn.net/menghuannvxia/article/details/53842320">HBase Rowkey的散列与预分区设计</a></li>
+<li><a href="http://www.inter12.org/archives/1192">滴滴hbase常见的rowkey设计</a></li>
+<li><a href="https://sematext.com/blog/hbasewd-avoid-regionserver-hotspotting-despite-writing-records-with-sequential-keys/">HBaseWD: Avoid RegionServer Hotspotting Despite Sequential Keys</a> *** 代码</li>
+<li><a href="https://help.aliyun.com/document_detail/59035.htm?spm=a2c4g.11186623.2.2.500e620cMI9Ks1">Rowkey设计</a> 阿里云</li>
+<li><a href="https://help.aliyun.com/document_detail/71787.html">预分区</a> 阿里云</li>
+</ol>
+</article>
+ 
+      
+
+      <footer class="book-footer">
+        
+  <div class="flex flex-wrap justify-between">
+
+
+
+
+
+</div>
+
+
+
+  <script>(function(){function e(e){const t=window.getSelection(),n=document.createRange();n.selectNodeContents(e),t.removeAllRanges(),t.addRange(n)}document.querySelectorAll("pre code").forEach(t=>{t.addEventListener("click",function(){if(window.getSelection().toString())return;e(t.parentElement),navigator.clipboard&&navigator.clipboard.writeText(t.parentElement.textContent)})})})()</script>
+
+
+ 
+        
+      </footer>
+
+      
+  
+  <div class="book-comments">
+
+</div>
+  
+ 
+
+      <label for="menu-control" class="hidden book-menu-overlay"></label>
+    </div>
+
+    
+    <aside class="book-toc">
+      <div class="book-toc-content">
+        
+  
+<nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#目录">目录</a></li>
+      </ul>
+    </li>
+    <li><a href="#目标">目标</a></li>
+    <li><a href="#rowkey设计的原则">Rowkey设计的原则</a></li>
+    <li><a href="#row_key设计-防止热点的三种方法">Row_key设计 防止热点的三种方法</a>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#hash-通用">Hash (通用)</a></li>
+            <li><a href="#reversing">Reversing</a></li>
+            <li><a href="#salt">Salt</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#hbase-sdk与预分区-相关的参数">HBase SDK与预分区 相关的参数</a></li>
+    <li><a href="#分区数建议">分区数建议</a></li>
+    <li><a href="#可配置的分区数">可配置的分区数</a></li>
+    <li><a href="#已有表负载不均衡的表迁移到新的表-暂时不做">已有表（负载不均衡的表）迁移到新的表-暂时不做</a></li>
+    <li><a href="#总结">总结</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+
+
+ 
+      </div>
+    </aside>
+    
+  </main>
+
+  
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
