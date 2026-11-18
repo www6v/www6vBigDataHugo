@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Docs on BigData</title>
-    <link>http://localhost:1313/www6vBigData/docs/</link>
+    <link>https://www6v.github.io/www6vBigData/docs/</link>
     <description>Recent content in Docs on BigData</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Mon, 19 Sep 2022 10:58:55 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/www6vBigData/docs/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://www6v.github.io/www6vBigData/docs/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>大数据  汇总</title>
-      <link>http://localhost:1313/www6vBigData/docs/bigDataSummary/</link>
+      <link>https://www6v.github.io/www6vBigData/docs/bigDataSummary/</link>
       <pubDate>Mon, 19 Sep 2022 10:58:55 +0000</pubDate>
-      <guid>http://localhost:1313/www6vBigData/docs/bigDataSummary/</guid>
+      <guid>https://www6v.github.io/www6vBigData/docs/bigDataSummary/</guid>
       <description>&lt;h1 id=&#34;存储&#34;&gt;&#xA;  存储&#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#%e5%ad%98%e5%82%a8&#34;&gt;#&lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;clickhouse&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;rsquo;elasticsearchModel&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;rsquo;elasticsearchDistributed&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;rsquo;elasticsearch&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;hbaselsmTree&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;hbaseHotkey&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;hbase&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;hdfs&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;iceberg&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;bigDataMetaMgt&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;bigDataStorage&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h1 id=&#34;平台&#34;&gt;&#xA;  平台&#xA;  &lt;a class=&#34;anchor&#34; href=&#34;#%e5%b9%b3%e5%8f%b0&#34;&gt;#&lt;/a&gt;&#xA;&lt;/h1&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;dataMiddlePlatform&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;realtimeDataWarehouse&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;streamingBatchIntegration&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;userBehaviorAnalysis&amp;rsquo; %}&lt;/p&gt;&#xA;&lt;/li&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;{% post_link &amp;lsquo;olap&amp;rsquo; %}&lt;/p&gt;</description>
     </item>
   </channel>

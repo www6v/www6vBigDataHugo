@@ -2,17 +2,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on BigData</title>
-    <link>http://localhost:1313/www6vBigData/tags/</link>
+    <link>https://www6v.github.io/www6vBigData/tags/</link>
     <description>Recent content in Tags on BigData</description>
     <generator>Hugo</generator>
     <language>en</language>
-    <atom:link href="http://localhost:1313/www6vBigData/tags/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>流式计算</title>
-      <link>http://localhost:1313/www6vBigData/tags/%E6%B5%81%E5%BC%8F%E8%AE%A1%E7%AE%97/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/www6vBigData/tags/%E6%B5%81%E5%BC%8F%E8%AE%A1%E7%AE%97/</guid>
-      <description></description>
-    </item>
+    <atom:link href="https://www6v.github.io/www6vBigData/tags/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
